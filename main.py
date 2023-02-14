@@ -77,7 +77,7 @@ def play_again():
 window = Tk()
 
 window.geometry('450x450')
-window.config(background='black')
+window.config(background='black', pady=10)
 window.title("Tic Toc Toe")
 
 players = ['O', 'X']
