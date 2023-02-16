@@ -10,11 +10,9 @@ import random
 def next_move(row, column):
     global player
 
-    if check_winner():
 
-        label_player.config(text=player + ' win')
 
-    elif (buttons[row][column])['text'] == "" and fill() == False:
+    if (buttons[row][column])['text'] == "" and fill() == False:
         (buttons[row][column])['text'] = player
 
         if check_winner() == False and fill() == False:
@@ -27,6 +25,14 @@ def next_move(row, column):
 
         elif check_winner() == False and fill() == True:
             label_player['text'] = "Tie"
+            count_tie = counter_tie.get()
+            count_tie += 1
+            counter_tie.set(count_tie)
+            label_tie['text'] = 'tie:' + str(count_tie) + " "
+
+    elif check_winner():
+
+        label_player.config(text=player + ' win')
 
 
 def fill():
@@ -39,24 +45,59 @@ def fill():
     else:
         return True
 
+def counter_win():
+    print('input')
+    if player == players[0]:
+        print('player o')
+        counter_o = counter_player_o.get()
+        counter_o += 1
+        print(counter_o)
+        counter_player_o.set(counter_o)
+        label_player_o['text'] = 'o:' + str(counter_o) + " "
+
+    else:
+        print('player x')
+        counter_x = counter_player_x.get()
+        counter_x += 1
+        print(counter_x)
+        counter_player_x.set(counter_x)
+        label_player_x['text'] = 'X:' + str(counter_x) + " "
+
 
 def check_winner():
     for column in range(3):
         if buttons[0][column]['text'] == buttons[1][column]['text'] == buttons[2][column]['text'] != "":
             label_player.config(text=player + ' win')
+            print('case1')
+            counter_win()
+            for row in range(3):
+                buttons[row][column].configure(bg = "red")
             return True
 
     for row in range(3):
         if buttons[row][0]['text'] == buttons[row][1]['text'] == buttons[row][2]['text'] != "":
             label_player.config(text=player + ' win')
+            print('case2')
+            counter_win()
+            for column in range(3):
+                buttons[row][column].configure(bg = "red")
             return True
 
     if buttons[0][0]['text'] == buttons[1][1]['text'] == buttons[2][2]['text'] != "":
         label_player.config(text=player + ' win')
+        print('case3')
+        counter_win()
+        for item in range(3):
+            buttons[item][item].configure(bg="red")
         return True
 
     if buttons[2][0]['text'] == buttons[1][1]['text'] == buttons[0][2]['text'] != "":
         label_player.config(text=player + ' win')
+        print('case4')
+        counter_win()
+        buttons[2][0].configure(bg="red")
+        buttons[1][1].configure(bg="red")
+        buttons[0][2].configure(bg="red")
         return True
 
     return False
@@ -77,7 +118,7 @@ def play_again():
 window = Tk()
 
 window.geometry('450x450')
-window.config(background='black', pady=10)
+window.config(background='#221122', pady=10)
 window.title("Tic Toc Toe")
 
 players = ['O', 'X']
@@ -86,11 +127,38 @@ buttons = [[0, 0, 0],
            [0, 0, 0],
            [0, 0, 0]]
 
-label_player = Label(window, text='Player:' + player + " ", font=('consolas', 25))
-label_player.pack(side='bottom')
+counter_player_o = IntVar(value=0)
+counter_player_x = IntVar(value=0)
+counter_tie = IntVar(value=0)
 
-reset_game = Button(window, text="play again", font=('consolas', 15), command=play_again)
-reset_game.pack(side='bottom')
+# ------ Frame Turn ---------------------
+
+frame_turn = Frame(window, padx=3)
+frame_turn.pack(side='bottom')
+
+label_player = Label(frame_turn, text='Player:' + player + " ", font=('consolas', 20))
+label_player.grid(row=0,column=0)
+
+reset_game = Button(frame_turn, text="play again", font=('consolas', 14),
+                    command=play_again, border=3, highlightcolor="#ff8899", bg="#888888")
+reset_game.grid(row=0,column=1, pady = 5)
+
+# ----------- Frame Score _______________
+
+frame_score = Frame(window )
+frame_score.pack(side='bottom', pady=5)
+
+label_player_x = Label(frame_score, text='X:0 ', font=('consolas', 20))
+label_player_x.grid(row=0,column=0)
+
+label_player_o = Label(frame_score, text='O:0 ', font=('consolas', 20))
+label_player_o.grid(row=0,column=1)
+
+label_tie = Label(frame_score, text='Tie:0 ', font=('consolas', 20))
+label_tie.grid(row=0,column=2)
+
+
+# ------------------ Frame Bottons ---------------------------
 
 frame = Frame(window)
 frame.pack()
@@ -98,6 +166,7 @@ frame.pack()
 for row in range(3):
     for column in range(3):
         buttons[row][column] = Button(frame, text="", width=6, height=2, font=('consolas', 25),
+                                      bg="#888888",
                                       command=lambda row=row, column=column: next_move(row, column))
         # lambda use pass row & column to next move function
 
